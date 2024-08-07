@@ -1,0 +1,48 @@
+version: '2'
+
+networks:
+  net:
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: ./images/nginx/dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./www:/var/www
+      - ./logs:/var/log/nginx
+    networks:
+      - net
+    depends_on:
+      - php_bx24
+  php_bx24:
+    extra_hosts:
+      - "${BITRIX_DB_URL}:host-gateway"
+      - "${API_URL}:host-gateway"
+    build:
+      context: .
+      dockerfile: ./images/php-bx24/dockerfile
+    volumes:
+      - ./www:/var/www
+    networks:
+      - net
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Europe/Moscow
+    networks:
+      - net
+

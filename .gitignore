@@ -1,0 +1,6 @@
+/.idea
+/rabbitmq
+/mysql
+*.log
+.env
+/www
